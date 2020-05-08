@@ -1,32 +1,29 @@
 {
   "schemaVersion": 1,
-  "id": "lock-minecart-view",
+  "id": "lock_minecart_view",
   "version": "${version}",
-  "name": "Minecart view lock",
-  "description": "Locks the view direction, when \"riding\" a minecart",
+  "name": "Lock Minecart view",
+  "description": "Locks minecart's view",
   "authors": [
-    "G.Team",
-    "KosmX"
+    "G.Team"
   ],
   "contributors": [],
-  "contact": {
-    "sources": "https://github.com/KosmX/lock-minecraft-view"
-  },
+  "contact": {},
   "license": "MIT",
-  "icon": "assets/lock-minecart-view/icon.png",
+  "icon": "assets/lock_minecart_view/icon.png",
   "environment": "*",
   "entrypoints": {
-    "main": [
-    ],
+    "main": [    ],
     "client": [
-      "LockMinecart.Client"
+      "com.kosmx.lockMinecartView.LoadMain"
     ],
     "server": []
   },
   "mixins": [
-    "lock-minecart-view.mixins.json"
+    "lock_minecart_view.mixins.json"
   ],
   "depends": {
-    "fabricloader": ">=0.4.0"
+    "fabricloader": ">=0.4.0",
+    "fabric": "*"
   }
 }
