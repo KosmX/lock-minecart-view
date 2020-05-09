@@ -1,0 +1,11 @@
+{
+    "text.autoconfig.lock_minecart_view.title": "Lock MinecartView Config",
+    "text.autoconfig.lock_minecart_view.option.smoothMode": "Smooth rotation mode",
+    "text.autoconfig.lock_minecart_view.option.smartMode": "Smart mode (hint)",
+    "text.autoconfig.lock_minecart_view.option.smartMode.@Tooltip" : "Smart direction calculation (minecart hasn't got a usable yaw)",
+    "text.autoconfig.lock_minecart_view.option.treshold": "Rotation reset treshold",
+    "text.autoconfig.lock_minecart_view.option.treshold.@Tooltip": "20 tick is 1 second",
+    "text.autoconfig.lock_minecart_view.option.rollerCoasterMode": "Roller-Coaster mode",
+    "text.autoconfig.lock_minecart_view.option.rollerCoasterMode.@Tooltip": "Enforce to look forward.\nSmart mode has no effect, if turned on",
+    "key.lock_minecart_view.toggle": "Toggle MinecartView"
+}

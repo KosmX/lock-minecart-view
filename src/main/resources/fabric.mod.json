@@ -5,7 +5,8 @@
   "name": "Lock Minecart view",
   "description": "Locks minecart's view",
   "authors": [
-    "G.Team"
+    "G.Team",
+    "KosmX"
   ],
   "contributors": [],
   "contact": {},
@@ -13,17 +14,21 @@
   "icon": "assets/lock_minecart_view/icon.png",
   "environment": "*",
   "entrypoints": {
-    "main": [    ],
+    "main": [],
     "client": [
-      "com.kosmx.lockMinecartView.LoadMain"
+      "com.kosmx.lockMinecartView.LockViewClient"
     ],
-    "server": []
+    "server": [],
+    "modmenu":[
+      "com.kosmx.lockMinecartView.LockViewMenu"
+    ]
   },
   "mixins": [
     "lock_minecart_view.mixins.json"
   ],
   "depends": {
     "fabricloader": ">=0.4.0",
-    "fabric": "*"
+    "fabric": "*",
+    "modmenu": "*"
   }
 }
