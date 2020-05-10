@@ -33,8 +33,6 @@ public class LockViewClient implements ClientModInitializer {
     public static float yaw = 0f;
     //public static float pitch = 0f;
     private static boolean doCorrection;
-    private static Vec3d velocity;
-    private static int lastTeleport = 0;
     @Nullable
     private static Vec3d lastCoord = null;
     private static float lastYaw = 0f;
@@ -122,10 +120,14 @@ public class LockViewClient implements ClientModInitializer {
             }
             Vec3d vec3d = minecart.getPos();
             if(lastCoord != null){
-                velocity = vec3d.add(lastCoord.negate());
-            }
-            else{
-                velocity = new Vec3d(0, 0, 0);
+                Vec3d velocity = new Vec3d(vec3d.x - lastCoord.x, 0, vec3d.z - lastCoord.z);
+                log(Level.INFO, Double.toString(velocity.normalize().dotProduct(minecart.getVelocity().normalize())));
+                if(
+                    velocity.lengthSquared() > 0.000008f &&
+                    Math.abs(velocity.normalize().dotProduct(minecart.getVelocity().normalize())) < 0.5   //vectors dot product ~0, if vectors are ~perpendicular to each other
+                ){
+                    correction = false;
+                }
             }
             lastCoord = vec3d;
         }
