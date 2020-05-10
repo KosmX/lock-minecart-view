@@ -94,18 +94,18 @@ public class LockViewClient implements ClientModInitializer {
     public static void smartCalc(MinecartEntity minecart, Float yaw){
         LockViewClient.lastYaw = LockViewClient.yaw;
         boolean update = false;
-        if (minecart.getVelocity().lengthSquared()>0.000001f){
+        if (minecart.getVelocity().lengthSquared()>0.000002f){
             update = true;
             setMinecartDirection(minecart);
             //log(Level.INFO, Float.toString(LockViewClient.yaw - LockViewClient.lastYaw));
         }
-        if ((int)LockViewClient.tickAfterLastFollow++ > config.treshold){
+        if ((int)LockViewClient.tickAfterLastFollow++ >= config.treshold){
             LockViewClient.lastYaw = LockViewClient.yaw;
-            log(Level.INFO, "clear rotation" + Integer.toString(tickAfterLastFollow) + " : " + Boolean.toString(update));
+            //log(Level.INFO, "clear rotation" + Integer.toString(tickAfterLastFollow) + " : " + Boolean.toString(update));
         }
         else if(doCorrection){
             LockViewClient.lastYaw = normalize(LockViewClient.lastYaw + 180f);
-            log(Level.INFO, "do smart correction");
+            //log(Level.INFO, "do smart correction");
         }
         doCorrection = false;
         if(update) LockViewClient.tickAfterLastFollow = 0;
@@ -121,10 +121,12 @@ public class LockViewClient implements ClientModInitializer {
             Vec3d vec3d = minecart.getPos();
             if(lastCoord != null){
                 Vec3d velocity = new Vec3d(vec3d.x - lastCoord.x, 0, vec3d.z - lastCoord.z);
-                log(Level.INFO, Double.toString(velocity.normalize().dotProduct(minecart.getVelocity().normalize())));
+                Vec3d velocity2d = new Vec3d(minecart.getVelocity().getX(), 0, minecart.getVelocity().getZ());
+                log(Level.INFO, Double.toString(velocity2d.length() - velocity.length()));
                 if(
                     velocity.lengthSquared() > 0.000008f &&
-                    Math.abs(velocity.normalize().dotProduct(minecart.getVelocity().normalize())) < 0.5   //vectors dot product ~0, if vectors are ~perpendicular to each other
+                    Math.abs(velocity.normalize().dotProduct(velocity2d.normalize())) < 0.7f && //vectors dot product ~0, if vectors are ~perpendicular to each other
+                    velocity.lengthSquared() - velocity2d.lengthSquared() < 0.05f
                 ){
                     correction = false;
                 }
@@ -136,11 +138,12 @@ public class LockViewClient implements ClientModInitializer {
 
     public static float calcYaw(float entityYaw){
         //log(Level.INFO, Float.toString(LockViewClient.difference));
-        return normalize(entityYaw + LockViewClient.difference);
+        return entityYaw + LockViewClient.difference;
     }
 
+
     private static float normalize(Float f){
-        return (Math.abs(f) > 180f) ? (f < 0) ? f + 360f : f-360f : f;
+        return (Math.abs(f) > 180) ? (f < 0) ? f + 360f : f - 360f : f;
     }
 
 
@@ -172,10 +175,9 @@ public class LockViewClient implements ClientModInitializer {
             }
         });
     }
-
+    //net.minecraft.client.render.item.HeldItemRenderer
     public static void log(Level level, String message){
         LOGGER.log(level, "["+MOD_NAME+"] " + message);
     }
-
 
 }

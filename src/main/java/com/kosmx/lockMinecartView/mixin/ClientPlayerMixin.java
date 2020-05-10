@@ -44,6 +44,8 @@ public class ClientPlayerMixin extends AbstractClientPlayerEntity{
                 this.yaw = LockViewClient.calcYaw(this.yaw);
                 this.bodyYaw = LockViewClient.calcYaw(this.bodyYaw);
             }
+            //this.lastRenderYaw += LockViewClient.correction;
+            //this.renderYaw += LockViewClient.correction;
             //this.sendMovementPackets();
         }
     }
@@ -54,11 +56,7 @@ public class ClientPlayerMixin extends AbstractClientPlayerEntity{
     private void startRidingInject(Entity entity, boolean force, CallbackInfoReturnable<Object> info){
         //net.minecraft.client.network.ClientPlayerEntity
         LockViewClient.log(Level.INFO, "entering minecart");
-        MinecartEntity minecart = (MinecartEntity)entity;
         LockViewClient.onStartRiding();
-        if(minecart.getVelocity().lengthSquared() > 0.2f){
-            LockViewClient.setMinecartDirection(minecart.getVelocity());
-        }
     }
     
 }

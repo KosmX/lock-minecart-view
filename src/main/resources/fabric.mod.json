@@ -9,7 +9,11 @@
     "KosmX"
   ],
   "contributors": [],
-  "contact": {},
+  "contact": {
+    "homepage": "https://www.curseforge.com/minecraft/mc-mods/minecart-direction-follow",
+    "sources": "https://github.com/KosmX/lock-minecraft-view",
+    "issues": "https://github.com/KosmX/lock-minecraft-view/issues"
+  },
   "license": "MIT",
   "icon": "assets/lock_minecart_view/icon.png",
   "environment": "*",
@@ -28,7 +32,6 @@
   ],
   "depends": {
     "fabricloader": ">=0.4.0",
-    "fabric": "*",
-    "modmenu": "*"
+    "fabric": "*"
   }
 }
