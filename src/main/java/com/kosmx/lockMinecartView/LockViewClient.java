@@ -1,6 +1,8 @@
 package com.kosmx.lockMinecartView;
 
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.keybinding.FabricKeyBinding;
 import net.fabricmc.fabric.api.client.keybinding.KeyBindingRegistry;
 import net.fabricmc.fabric.api.event.client.ClientTickCallback;
@@ -19,6 +21,7 @@ import org.lwjgl.glfw.GLFW;
 import me.sargunvohra.mcmods.autoconfig1u.AutoConfig;
 import me.sargunvohra.mcmods.autoconfig1u.serializer.GsonConfigSerializer;
 
+
 public class LockViewClient implements ClientModInitializer {
 
     //-------------system variables--------------------
@@ -36,24 +39,26 @@ public class LockViewClient implements ClientModInitializer {
     @Nullable
     private static Vec3d lastCoord = null;
     private static float lastYaw = 0f;
+    private static Vec3d lastVelocity;
     private static float rawLastYaw;
     private static float rawYaw;
-    public static boolean isFollowingDirection = false;
     public static int tickAfterLastFollow = 0;
     private static float difference;
+    private static int lastSlowdown = 0;
 
     //-------------methods-----------------------------
 
     public static float sphericalFromVec3d(Vec3d vec3d){
         //float f = MathHelper.sqrt(Entity.squaredHorizontalLength(vec3d));
-        float yawF = (float)(MathHelper.atan2(-vec3d.x, vec3d.z) * 57.2957763671875D);
         //pitch = (float)(MathHelper.atan2(vec3d.y, (double)f) * 57.2957763671875D);
-        return yawF;
+        return (float)(MathHelper.atan2(-vec3d.x, vec3d.z) * 57.2957763671875D);
     }
 
-    public static void onStartRiding(){
+    public static boolean onStartRiding(){
         lastCoord = null;
         tickAfterLastFollow = 100;
+        lastVelocity = Vec3d.ZERO;
+        return !enabled;
     }
 
     public static void setMinecartDirection(float yawF){
@@ -91,7 +96,7 @@ public class LockViewClient implements ClientModInitializer {
         setMinecartDirection(sphericalFromVec3d(vec3d));
     }
 
-    public static void smartCalc(MinecartEntity minecart, Float yaw){
+    public static void smartCalc(MinecartEntity minecart){
         LockViewClient.lastYaw = LockViewClient.yaw;
         boolean update = false;
         if (minecart.getVelocity().lengthSquared()>0.000002f){
@@ -99,7 +104,7 @@ public class LockViewClient implements ClientModInitializer {
             setMinecartDirection(minecart);
             //log(Level.INFO, Float.toString(LockViewClient.yaw - LockViewClient.lastYaw));
         }
-        if ((int)LockViewClient.tickAfterLastFollow++ >= config.treshold){
+        if (LockViewClient.tickAfterLastFollow++ >= config.treshold){
             LockViewClient.lastYaw = LockViewClient.yaw;
             //log(Level.INFO, "clear rotation" + Integer.toString(tickAfterLastFollow) + " : " + Boolean.toString(update));
         }
@@ -112,28 +117,31 @@ public class LockViewClient implements ClientModInitializer {
         LockViewClient.difference = LockViewClient.yaw - LockViewClient.lastYaw;
     }
 
-    private static boolean checkSmartCorrection(MinecartEntity minecart){
+    private static void checkSmartCorrection(MinecartEntity minecart){
         boolean correction = false;
         if(config.smartMode){
-            if (Math.abs(LockViewClient.rawLastYaw - LockViewClient.rawYaw) > 135f && Math.abs(LockViewClient.rawLastYaw - LockViewClient.rawYaw)<225){
+            float ang = 60;
+            if (Math.abs(LockViewClient.rawLastYaw - LockViewClient.rawYaw) > 180f-ang && Math.abs(LockViewClient.rawLastYaw - LockViewClient.rawYaw)<180+ang){
                 correction = true;
             }
             Vec3d vec3d = minecart.getPos();
             if(lastCoord != null){
                 Vec3d velocity = new Vec3d(vec3d.x - lastCoord.x, 0, vec3d.z - lastCoord.z);
+                if(lastVelocity == null) lastVelocity = new Vec3d(0, 0, 0);
                 Vec3d velocity2d = new Vec3d(minecart.getVelocity().getX(), 0, minecart.getVelocity().getZ());
-                log(Level.INFO, Double.toString(velocity2d.length() - velocity.length()));
-                if(
-                    velocity.lengthSquared() > 0.000008f &&
-                    Math.abs(velocity.normalize().dotProduct(velocity2d.normalize())) < 0.7f && //vectors dot product ~0, if vectors are ~perpendicular to each other
-                    velocity.lengthSquared() - velocity2d.lengthSquared() < 0.05f
-                ){
+                log(Level.INFO, Double.toString(velocity2d.lengthSquared() - velocity.lengthSquared()));
+                log(Level.INFO, velocity.lengthSquared() + " : " + lastVelocity.lengthSquared());
+                if( velocity2d.length() != 0 && lastVelocity.length()/velocity2d.length() > 2) lastSlowdown = 0;
+                boolean bl1 = correction && velocity.lengthSquared() > 0.000008f && Math.abs(velocity.normalize().dotProduct(velocity2d.normalize())) < 0.7f;//vectors dot product ~0, if vectors are ~perpendicular to each other
+                boolean bl2 = (!bl1) || lastSlowdown++ < config.treshold && Math.abs(velocity.normalize().dotProduct(velocity2d.normalize())) < 0.866f && velocity2d.lengthSquared() < 0.24;
+                if(bl1 && !bl2) {
                     correction = false;
                 }
+                lastVelocity = velocity2d;
             }
             lastCoord = vec3d;
         }
-        return LockViewClient.doCorrection = correction;
+        LockViewClient.doCorrection = correction;
     }
 
     public static float calcYaw(float entityYaw){
@@ -168,7 +176,7 @@ public class LockViewClient implements ClientModInitializer {
             if (keyBinding.isPressed()){
                 if(isHeld)return;
                 isHeld = true;
-                enabled = !enabled;
+                enabled = onStartRiding();
             }
             else if (isHeld){
                 isHeld = false;

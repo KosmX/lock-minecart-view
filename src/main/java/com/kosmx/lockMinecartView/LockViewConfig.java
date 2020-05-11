@@ -15,7 +15,7 @@ public class LockViewConfig implements ConfigData{
 
     @ConfigEntry.BoundedDiscrete(min = 0, max = 80)
     @ConfigEntry.Gui.Tooltip
-    public int treshold = 20;
+    public int treshold = 8;
 
     @ConfigEntry.Gui.Tooltip
     public boolean rollerCoasterMode = false;

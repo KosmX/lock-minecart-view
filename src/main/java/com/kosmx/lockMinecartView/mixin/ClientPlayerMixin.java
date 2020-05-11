@@ -40,7 +40,7 @@ public class ClientPlayerMixin extends AbstractClientPlayerEntity{
                 //this.pitch = LockViewClient.pitch;
             }
             else{
-                LockViewClient.smartCalc(minecart, this.yaw);
+                LockViewClient.smartCalc(minecart);
                 this.yaw = LockViewClient.calcYaw(this.yaw);
                 this.bodyYaw = LockViewClient.calcYaw(this.bodyYaw);
             }
