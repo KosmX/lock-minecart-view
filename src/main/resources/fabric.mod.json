@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "lock_minecart_view",
   "version": "${version}",
-  "name": "Lock Minecart view",
+  "name": "Better minecart rotation",
   "description": "Locks minecart's view",
   "authors": [
     "G.Team",

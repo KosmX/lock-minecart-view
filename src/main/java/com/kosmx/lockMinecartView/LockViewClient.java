@@ -58,12 +58,13 @@ public class LockViewClient implements ClientModInitializer {
         lastCoord = null;
         tickAfterLastFollow = 100;
         lastVelocity = Vec3d.ZERO;
+        lastSlowdown = 100;
         return !enabled;
     }
 
     public static void setMinecartDirection(float yawF){
         if (config.smoothMode){
-            if(tickAfterLastFollow > config.treshold){
+            if(!config.rollerCoasterMode && tickAfterLastFollow > config.treshold){
                 LockViewClient.yaw = yawF;
             }
             else if(doCorrection){
@@ -129,11 +130,11 @@ public class LockViewClient implements ClientModInitializer {
                 Vec3d velocity = new Vec3d(vec3d.x - lastCoord.x, 0, vec3d.z - lastCoord.z);
                 if(lastVelocity == null) lastVelocity = new Vec3d(0, 0, 0);
                 Vec3d velocity2d = new Vec3d(minecart.getVelocity().getX(), 0, minecart.getVelocity().getZ());
-                log(Level.INFO, Double.toString(velocity2d.lengthSquared() - velocity.lengthSquared()));
-                log(Level.INFO, velocity.lengthSquared() + " : " + lastVelocity.lengthSquared());
-                if( velocity2d.length() != 0 && lastVelocity.length()/velocity2d.length() > 2) lastSlowdown = 0;
-                boolean bl1 = correction && velocity.lengthSquared() > 0.000008f && Math.abs(velocity.normalize().dotProduct(velocity2d.normalize())) < 0.7f;//vectors dot product ~0, if vectors are ~perpendicular to each other
-                boolean bl2 = (!bl1) || lastSlowdown++ < config.treshold && Math.abs(velocity.normalize().dotProduct(velocity2d.normalize())) < 0.866f && velocity2d.lengthSquared() < 0.24;
+                //log(Level.INFO, Double.toString(velocity2d.lengthSquared() - velocity.lengthSquared()));
+                //log(Level.INFO, velocity.lengthSquared() + " : " + lastVelocity.lengthSquared());
+                if( velocity2d.length() != 0 && lastVelocity.length()/velocity2d.length() > 2.4d) lastSlowdown = 0;
+                boolean bl1 = correction && velocity.lengthSquared() > 0.000008f && Math.abs(velocity.normalize().dotProduct(velocity2d.normalize())) < 0.8f;//vectors dot product ~0, if vectors are ~perpendicular to each other
+                boolean bl2 = (!bl1) || lastSlowdown++ < config.treshold && Math.abs(velocity.normalize().dotProduct(velocity2d.normalize())) < 0.866f && velocity2d.lengthSquared() < 0.32;
                 if(bl1 && !bl2) {
                     correction = false;
                 }
