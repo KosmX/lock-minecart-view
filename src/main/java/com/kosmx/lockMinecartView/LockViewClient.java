@@ -1,8 +1,6 @@
 package com.kosmx.lockMinecartView;
 
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.keybinding.FabricKeyBinding;
 import net.fabricmc.fabric.api.client.keybinding.KeyBindingRegistry;
 import net.fabricmc.fabric.api.event.client.ClientTickCallback;
@@ -64,7 +62,7 @@ public class LockViewClient implements ClientModInitializer {
 
     public static void setMinecartDirection(float yawF){
         if (config.smoothMode){
-            if(!config.rollerCoasterMode && tickAfterLastFollow > config.treshold){
+            if(!config.rollerCoasterMode && tickAfterLastFollow > config.threshold){
                 LockViewClient.yaw = yawF;
             }
             else if(doCorrection){
@@ -105,7 +103,7 @@ public class LockViewClient implements ClientModInitializer {
             setMinecartDirection(minecart);
             //log(Level.INFO, Float.toString(LockViewClient.yaw - LockViewClient.lastYaw));
         }
-        if (LockViewClient.tickAfterLastFollow++ >= config.treshold){
+        if (LockViewClient.tickAfterLastFollow++ >= config.threshold){
             LockViewClient.lastYaw = LockViewClient.yaw;
             //log(Level.INFO, "clear rotation" + Integer.toString(tickAfterLastFollow) + " : " + Boolean.toString(update));
         }
@@ -134,7 +132,7 @@ public class LockViewClient implements ClientModInitializer {
                 //log(Level.INFO, velocity.lengthSquared() + " : " + lastVelocity.lengthSquared());
                 if( velocity2d.length() != 0 && lastVelocity.length()/velocity2d.length() > 2.4d) lastSlowdown = 0;
                 boolean bl1 = correction && velocity.lengthSquared() > 0.000008f && Math.abs(velocity.normalize().dotProduct(velocity2d.normalize())) < 0.8f;//vectors dot product ~0, if vectors are ~perpendicular to each other
-                boolean bl2 = (!bl1) || lastSlowdown++ < config.treshold && Math.abs(velocity.normalize().dotProduct(velocity2d.normalize())) < 0.866f && velocity2d.lengthSquared() < 0.32;
+                boolean bl2 = (!bl1) || lastSlowdown++ < config.threshold && Math.abs(velocity.normalize().dotProduct(velocity2d.normalize())) < 0.866f && velocity2d.lengthSquared() < 0.32;
                 if(bl1 && !bl2) {
                     correction = false;
                 }
