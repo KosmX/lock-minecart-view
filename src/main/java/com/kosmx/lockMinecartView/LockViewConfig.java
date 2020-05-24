@@ -20,5 +20,8 @@ public class LockViewConfig implements ConfigData{
     @ConfigEntry.Gui.Tooltip
     public boolean rollerCoasterMode = false;
 
+    @ConfigEntry.Gui.Tooltip
+    public boolean enabled = true;
+
 
 }

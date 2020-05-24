@@ -26,7 +26,7 @@ public class LockViewClient implements ClientModInitializer {
     private static boolean isHeld = false;
     private static FabricKeyBinding keyBinding;
     public static LockViewConfig config;
-    public static boolean enabled = true;
+    public static boolean enabled;
     public static Logger LOGGER = LogManager.getLogger();
     public static final String MOD_ID = "lock_minecart_view";
     public static final String MOD_NAME = "Lock Minecart view";
@@ -123,13 +123,22 @@ public class LockViewClient implements ClientModInitializer {
             if (Math.abs(LockViewClient.rawLastYaw - LockViewClient.rawYaw) > 180f-ang && Math.abs(LockViewClient.rawLastYaw - LockViewClient.rawYaw)<180+ang){
                 correction = true;
             }
+            /*-------------------Explain, what does the following complicated code------------------------
+             *The Smart correction's aim is to make difference between a U-turn and a collision, what is'n an easy task
+             * The speed vector always rotate in 180* so I need data somewhere else:Position->real speed(with a little delay)
+             * I observed 2 things.
+             * 1:On collision, the speed decreases
+             * 2:On taking U-turn, the real velocity vector and the minecart.getVelocity() are ~perpendicular
+             *              :D          Don't give up!!! (message to everyone, who read my code)
+             */
+
             Vec3d vec3d = minecart.getPos();
             if(lastCoord != null){
                 Vec3d velocity = new Vec3d(vec3d.x - lastCoord.x, 0, vec3d.z - lastCoord.z);
                 if(lastVelocity == null) lastVelocity = new Vec3d(0, 0, 0);
                 Vec3d velocity2d = new Vec3d(minecart.getVelocity().getX(), 0, minecart.getVelocity().getZ());
-                //log(Level.INFO, Double.toString(velocity2d.lengthSquared() - velocity.lengthSquared()));
-                //log(Level.INFO, velocity.lengthSquared() + " : " + lastVelocity.lengthSquared());
+                    //log(Level.INFO, Double.toString(velocity2d.lengthSquared() - velocity.lengthSquared()));  //debugger
+                    //log(Level.INFO, velocity.lengthSquared() + " : " + lastVelocity.lengthSquared());
                 if( velocity2d.length() != 0 && lastVelocity.length()/velocity2d.length() > 2.4d) lastSlowdown = 0;
                 boolean bl1 = correction && velocity.lengthSquared() > 0.000008f && Math.abs(velocity.normalize().dotProduct(velocity2d.normalize())) < 0.8f;//vectors dot product ~0, if vectors are ~perpendicular to each other
                 boolean bl2 = (!bl1) || lastSlowdown++ < config.threshold && Math.abs(velocity.normalize().dotProduct(velocity2d.normalize())) < 0.866f && velocity2d.lengthSquared() < 0.32;
@@ -160,16 +169,22 @@ public class LockViewClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         log(Level.INFO, "Initializing");
+
+        //setup Config
         AutoConfig.register(LockViewConfig.class, GsonConfigSerializer::new);
         config = AutoConfig.getConfigHolder(LockViewConfig.class).getConfig();
+        enabled = config.enabled;
+
+
+        //setup key
         keyBinding = FabricKeyBinding.Builder.create(
             new Identifier(MOD_ID, "toggle"), 
             net.minecraft.client.util.InputUtil.Type.KEYSYM, 
             GLFW.GLFW_KEY_F7, 
             MOD_NAME
-        ).build();
+        ).build();          //pre-create key
         KeyBindingRegistry.INSTANCE.addCategory(MOD_NAME);
-        KeyBindingRegistry.INSTANCE.register(keyBinding);
+        KeyBindingRegistry.INSTANCE.register(keyBinding);   //register key
         ClientTickCallback.EVENT.register(e ->
         {
             if (keyBinding.isPressed()){
