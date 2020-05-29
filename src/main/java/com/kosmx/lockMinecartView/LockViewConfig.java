@@ -23,5 +23,7 @@ public class LockViewConfig implements ConfigData{
     @ConfigEntry.Gui.Tooltip
     public boolean enabled = true;
 
+    @ConfigEntry.Gui.Tooltip
+    public boolean showDebug = false;
 
 }

@@ -10,5 +10,7 @@
     "text.autoconfig.lock_minecart_view.option.rollerCoasterMode.@Tooltip": "Enforce to look forward. Smart mode has no effect, if turned on",
     "text.autoconfig.lock_minecart_view.option.enabled": "Enable mod on starting the game",
     "text.autoconfig.lock_minecart_view.option.enabled.@Tooltip": "spenceregilbert asked me, to add this entry",
+    "text.autoconfig.lock_minecart_view.option.showDebug": "Show debug info in F3 screen",
+    "text.autoconfig.lock_minecart_view.option.showDebug.@Tooltip": "Only available in Fabric version",
     "key.lock_minecart_view.toggle": "Toggle MinecartView"
 }
