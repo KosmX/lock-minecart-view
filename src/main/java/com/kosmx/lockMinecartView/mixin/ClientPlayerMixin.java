@@ -28,9 +28,9 @@ public class ClientPlayerMixin extends AbstractClientPlayerEntity{
         Entity vehicle = this.getVehicle();
         if(LockViewClient.enabled && vehicle instanceof MinecartEntity){
             MinecartEntity minecart = (MinecartEntity)vehicle;
-            /*Using MinecartEntity.getYaw() is unusable, because it's not the minecart's yaw... I don't know what
-             *There is NO method in mc to get the minecart's yaw...
-             *I need to create any identifier method (from the speed)
+            /*Using MinecartEntity.getYaw() is unusable, because it's not the minecart's yaw... I don't know what @!& is it
+             *There is NO method in mc to get the minecart's real yaw...
+             *I need to create my own identifier method (from the speed)
              */
             if(LockViewClient.config.rollerCoasterMode && vehicle.getVelocity().lengthSquared()>0.000001f){
                 LockViewClient.setMinecartDirection(minecart.getVelocity());
