@@ -88,7 +88,7 @@ public class LockViewClient implements ClientModInitializer {
             correction = true;
             if(pistorRailTick != 0)pistorRailTick--;
         }
-        else if(minecart.getVelocity().lengthSquared() == 0f && successUpdate && posVelocity.lengthSquared() > 0.04f){
+        else if(minecart.getVelocity().lengthSquared() == 0f && successUpdate && posVelocity.lengthSquared() > 0.02f){
             if(pistorRailTick != config.threshold){
                 pistorRailTick++;
             }
