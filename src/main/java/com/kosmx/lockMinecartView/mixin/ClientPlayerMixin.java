@@ -45,7 +45,7 @@ public class ClientPlayerMixin extends AbstractClientPlayerEntity{
         target = "Lnet/minecraft/client/MinecraftClient;getSoundManager()Lnet/minecraft/client/sound/SoundManager;"))
     private void startRidingInject(Entity entity, boolean force, CallbackInfoReturnable<Object> info){
         //net.minecraft.client.network.ClientPlayerEntity
-        if (LockViewClient.config.showDebug) LockViewClient.log(Level.INFO, "entering minecart");
+        LockViewClient.log(Level.INFO, "entering minecart");
         LockViewClient.onStartRiding();
     }
     
