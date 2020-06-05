@@ -36,7 +36,7 @@ public class LockViewClient implements ClientModInitializer {
     public static final String MOD_ID = "lock_minecart_view";
     public static final String MOD_NAME = "Better Minecart rotation"; //To be correct
     //-------------calculating vars--------------------
-    public static float yaw = 0f;
+    private static float yaw = 0f;
     //public static float pitch = 0f;
     private static boolean doCorrection;
 
@@ -53,7 +53,7 @@ public class LockViewClient implements ClientModInitializer {
     private static Vec3d lastVelocity;
     private static float rawLastYaw;
     private static float rawYaw;
-    public static int tickAfterLastFollow = 0;
+    private static int tickAfterLastFollow = 0;
     private static int tickAfterPistonRail;
     private static float difference;
     private static int lastSlowdown = 0;
@@ -61,13 +61,13 @@ public class LockViewClient implements ClientModInitializer {
 
     //-----------------CORE METHOD-----------------------
 
-    public static void smartCalc(MinecartEntity minecart){
+    public static void update(MinecartEntity minecart){
         LockViewClient.lastYaw = LockViewClient.yaw;
         //if (minecart.getVelocity().lengthSquared()>0.000002f)
         //update = true;
         boolean update = setMinecartDirection(minecart);
         //log(Level.INFO, Float.toString(LockViewClient.yaw - LockViewClient.lastYaw));
-        if (LockViewClient.tickAfterLastFollow++ >= config.threshold){
+        if (tickAfterLastFollow++ > config.threshold){
             LockViewClient.lastYaw = LockViewClient.yaw;
             //log(Level.INFO, "clear rotation" + Integer.toString(tickAfterLastFollow) + " : " + Boolean.toString(update));
         }
@@ -77,28 +77,28 @@ public class LockViewClient implements ClientModInitializer {
         }
         doCorrection = false;
         if(update) LockViewClient.tickAfterLastFollow = 0;
-        LockViewClient.difference = LockViewClient.yaw - LockViewClient.lastYaw;
+        LockViewClient.difference = normalize(LockViewClient.yaw - LockViewClient.lastYaw);
     }
 
     public static boolean setMinecartDirection(MinecartEntity minecart){
         boolean update = false;
         float yawF = rawYaw;
+        boolean successUpdate = updateSmartCorrection(minecart);
         if (minecart.getVelocity().lengthSquared()>0.000002f) {
             if (tickAfterPistonRail != config.threshold) tickAfterPistonRail++;
             yawF = sphericalFromVec3d(minecart.getVelocity());
-            updateSmartCorrection(minecart);
             update = true;
         }
-        else if(minecart.getVelocity().lengthSquared() == 0 && updateSmartCorrection(minecart) && posVelocity.lengthSquared() != 0){
-            tickAfterPistonRail = 0;  //
-            yawF = sphericalFromVec3d(posVelocity);
+        else if(minecart.getVelocity().lengthSquared() == 0f && successUpdate && posVelocity.lengthSquared() != 0f){
+            tickAfterPistonRail = 0;
+            yawF = getEighthDirection(sphericalFromVec3d(posVelocity));
             update = true;
         }
 
         LockViewClient.rawLastYaw = LockViewClient.rawYaw;
         rawYaw = yawF;
-        if (update) checkSmartCorrection(minecart);
-        setMinecartDirection(rawYaw);
+        if (update) checkSmartCorrection(minecart, successUpdate);
+        setMinecartDirection(yawF);
         return update;
     }
     //-------------methods-----------------------------
@@ -145,18 +145,11 @@ public class LockViewClient implements ClientModInitializer {
     }
 
 
-
-
-    public static void setMinecartDirection(Vec3d vec3d){
-        setMinecartDirection(sphericalFromVec3d(vec3d));
-    }
-
-
-    private static void checkSmartCorrection(MinecartEntity minecart){
+    private static void checkSmartCorrection(MinecartEntity minecart, boolean successUpdate){
         boolean correction = false;
         if(config.smartMode){
             float ang = 60;
-            if (tickAfterPistonRail < config.threshold && Math.abs(rawLastYaw - rawYaw) > 180f-ang && Math.abs(rawLastYaw - rawYaw)<180+ang) {
+            if (tickAfterPistonRail == config.threshold && Math.abs(rawLastYaw - rawYaw) > 180f-ang && Math.abs(rawLastYaw - rawYaw)<180+ang) {
                 correction = true;
                 /*-------------------Explain, what does the following complicated code------------------------
                  *The Smart correction's aim is to make difference between a U-turn and a collision, what is'n an easy task
@@ -172,8 +165,8 @@ public class LockViewClient implements ClientModInitializer {
                  *
                  *              :D          Don't give up!!! (message to everyone, who read my code)
                  */
-
-                if (lastCoord != null) {
+                //log(Level.INFO, "initCorrection");
+                if (successUpdate) {
                     boolean bl1 = posVelocity.lengthSquared() > 0.000008f && Math.abs(posVelocity.normalize().dotProduct(gotVelocity.normalize())) < 0.8f;//vectors dot product ~0, if vectors are ~perpendicular to each other
                     boolean bl2 = (!bl1) || lastSlowdown < config.threshold && Math.abs(posVelocity.normalize().dotProduct(gotVelocity.normalize())) < 0.866f && gotVelocity.lengthSquared() < 0.32;
                     if (bl1 && !bl2) {
@@ -201,12 +194,26 @@ public class LockViewClient implements ClientModInitializer {
 
     public static float calcYaw(float entityYaw){
         //log(Level.INFO, Float.toString(LockViewClient.difference));
-        return entityYaw + LockViewClient.difference;
+        return (config.rollerCoasterMode) ? (entityYaw + normalize(yaw - entityYaw)) : (entityYaw + LockViewClient.difference);
+        //return entityYaw + difference;
     }
 
 
     private static float normalize(Float f){
         return (Math.abs(f) > 180) ? (f < 0) ? f + 360f : f - 360f : f;
+    }
+
+    private static float getEighthDirection(Float f){
+        if(floatCircleDistance(f%90 , 0, 90) < 20){
+            return ((float)Math.round(f/90))*90;
+        }
+        else return f;
+    }
+
+    private static float floatCircleDistance(float i1, float i2, float size){
+        float dist1 = Math.abs(i1-i2);
+        float dist2 = Math.abs(dist1 - size);
+        return Math.min(dist1, dist2);
     }
 
 
@@ -219,18 +226,19 @@ public class LockViewClient implements ClientModInitializer {
         boolean bl2 = false;
         if(gotVelocity != null) {
             bl1 = true;
-            list.add("\"fake\" velocity: " + Double.toString(gotVelocity.length()));
+            list.add("\"fake\" velocity: " + gotVelocity.length());
         }
         if(posVelocity != null){
-            list.add("real velocity: " + Double.toString(posVelocity.length()));
+            list.add("real velocity: " + posVelocity.length());
             if(posVelocity.length() > 0.00000001) bl2 = true;
         }
         if(bl1 && bl2){
-            list.add("quotient(fake/real): " + Double.toString(gotVelocity.length()/posVelocity.length()));
+            list.add("quotient(fake/real): " + gotVelocity.length()/posVelocity.length());
         }
         else list.add("quotient(fake/real): ∞");
-        list.add("minecart's yaw: " + Float.toString(rawYaw));
-        list.add("Last slowdown (collision): " + Integer.toString(lastSlowdown));
+        list.add("minecart's yaw: " + rawYaw);
+        list.add("Last slowdown (collision): " + lastSlowdown);
+        list.add("Last success update: " + tickAfterLastFollow);
         return list;
     }
 

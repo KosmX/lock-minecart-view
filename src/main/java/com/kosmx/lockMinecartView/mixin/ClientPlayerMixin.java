@@ -27,23 +27,13 @@ public class ClientPlayerMixin extends AbstractClientPlayerEntity{
     private void ridingTick(CallbackInfo info){
         Entity vehicle = this.getVehicle();
         if(LockViewClient.enabled && vehicle instanceof MinecartEntity){
-            MinecartEntity minecart = (MinecartEntity)vehicle;
             /*Using MinecartEntity.getYaw() is unusable, because it's not the minecart's yaw... I don't know what @!& is it
              *There is NO method in mc to get the minecart's real yaw...
              *I need to create my own identifier method (from the speed)
              */
-            if(LockViewClient.config.rollerCoasterMode && vehicle.getVelocity().lengthSquared()>0.000001f){
-                LockViewClient.setMinecartDirection(minecart.getVelocity());
-                //this.setHeadYaw(LockViewClient.yaw);       //only camera
-                this.yaw = LockViewClient.yaw;
-                this.bodyYaw = LockViewClient.yaw;    //Only client side
-                //this.pitch = LockViewClient.pitch;
-            }
-            else{
-                LockViewClient.smartCalc(minecart);
-                this.yaw = LockViewClient.calcYaw(this.yaw);
-                this.bodyYaw = LockViewClient.calcYaw(this.bodyYaw);
-            }
+            LockViewClient.update((MinecartEntity)vehicle);
+            this.yaw = LockViewClient.calcYaw(this.yaw);
+            this.bodyYaw = LockViewClient.calcYaw(this.bodyYaw);
             //this.lastRenderYaw += LockViewClient.correction;
             //this.renderYaw += LockViewClient.correction;
             //this.sendMovementPackets();
@@ -55,7 +45,7 @@ public class ClientPlayerMixin extends AbstractClientPlayerEntity{
         target = "Lnet/minecraft/client/MinecraftClient;getSoundManager()Lnet/minecraft/client/sound/SoundManager;"))
     private void startRidingInject(Entity entity, boolean force, CallbackInfoReturnable<Object> info){
         //net.minecraft.client.network.ClientPlayerEntity
-        LockViewClient.log(Level.INFO, "entering minecart");
+        if (LockViewClient.config.showDebug) LockViewClient.log(Level.INFO, "entering minecart");
         LockViewClient.onStartRiding();
     }
     
