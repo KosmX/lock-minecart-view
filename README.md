@@ -1,4 +1,4 @@
-#Better minecart rotation
+# Better minecart rotation
 
 **lock-minecart-view**
 Minecraft mod using Fabric
