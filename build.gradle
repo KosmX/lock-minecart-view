@@ -69,7 +69,7 @@ publishing {
 			artifact(jar) {
 				builtBy remapJar
 			}
-			artifact("${project.buildDir.absolutePath}/libs/${archivesBaseName}-${project.version}-for-MC${project.target}.jar"){
+			artifact("${project.buildDir.absolutePath}/libs/${archivesBaseName}-${project.version}-for-MC${project.minecraft_version}.jar"){
 				builtBy remapJar
 			}
 			artifact(sourcesJar) {
