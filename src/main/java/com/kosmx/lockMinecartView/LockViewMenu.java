@@ -13,12 +13,6 @@ import net.minecraft.client.gui.screen.Screen;
 public class LockViewMenu implements ModMenuApi{
 
     @Override
-    public String getModId() {
-        return "lock_minecart_view";
-    }
-
-
-    @Override
     public ConfigScreenFactory<?> getModConfigScreenFactory() {
         return screen -> AutoConfig.getConfigScreen(LockViewConfig.class, screen).get();
     }

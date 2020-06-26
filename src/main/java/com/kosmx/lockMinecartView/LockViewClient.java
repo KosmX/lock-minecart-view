@@ -4,7 +4,10 @@ import com.google.common.collect.Lists;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.keybinding.FabricKeyBinding;
 import net.fabricmc.fabric.api.client.keybinding.KeyBindingRegistry;
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.event.client.ClientTickCallback;
+import net.minecraft.client.options.KeyBinding;
+import net.minecraft.client.util.InputUtil;
 import net.minecraft.entity.vehicle.MinecartEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
@@ -29,7 +32,7 @@ public class LockViewClient implements ClientModInitializer {
 
     //-------------system variables--------------------
     private static boolean isHeld = false;
-    private static FabricKeyBinding keyBinding;
+    private static KeyBinding keyBinding;
     public static LockViewConfig config;
     public static boolean enabled;
     public static Logger LOGGER = LogManager.getLogger();
@@ -265,12 +268,15 @@ public class LockViewClient implements ClientModInitializer {
 
 
         //setup key
-        keyBinding = FabricKeyBinding.Builder.create(
+        keyBinding = KeyBindingHelper.registerKeyBinding(new KeyBinding(MOD_ID + ".toggle", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_F7, MOD_NAME));
+                /*
             new Identifier(MOD_ID, "toggle"), 
             net.minecraft.client.util.InputUtil.Type.KEYSYM, 
             GLFW.GLFW_KEY_F7, 
             MOD_NAME
         ).build();          //pre-create key
+
+                 */
         KeyBindingRegistry.INSTANCE.addCategory(MOD_NAME);
         KeyBindingRegistry.INSTANCE.register(keyBinding);   //register key
         ClientTickCallback.EVENT.register(e ->
