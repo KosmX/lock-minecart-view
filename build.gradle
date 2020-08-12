@@ -6,7 +6,7 @@ plugins {
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
-archivesBaseName = "${project.archives_base_name}-for-MC${project.minecraft_version}"
+archivesBaseName = "${project.archives_base_name}"
 version = project.mod_version
 group = project.maven_group
 
@@ -22,11 +22,11 @@ dependencies {
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 	//modImplementation "io.github.prospector:modmenu:${project.modmenu_version}"
 	modImplementation "io.github.prospector:modmenu:${project.modmenu_version}"
-	include "io.github.prospector:modmenu:${project.modmenu_version}"
+	//include "io.github.prospector:modmenu:${project.modmenu_version}"
 	modImplementation "me.sargunvohra.mcmods:autoconfig1u:${project.autoconfig_version}"
-	include "me.sargunvohra.mcmods:autoconfig1u:${project.autoconfig_version}"
+	//include "me.sargunvohra.mcmods:autoconfig1u:${project.autoconfig_version}"
 	modImplementation "me.shedaniel.cloth:config-2:${project.cloth_version}"
-	include "me.shedaniel.cloth:config-2:${project.cloth_version}"
+	//include "me.shedaniel.cloth:config-2:${project.cloth_version}"
 }
 
 processResources {
