@@ -1,11 +1,11 @@
 package com.kosmx.lockMinecartView;
 
-import me.sargunvohra.mcmods.autoconfig1u.ConfigData;
-import me.sargunvohra.mcmods.autoconfig1u.annotation.Config;
-import me.sargunvohra.mcmods.autoconfig1u.annotation.ConfigEntry;
+import me.shedaniel.autoconfig.ConfigData;
+import me.shedaniel.autoconfig.annotation.Config;
+import me.shedaniel.autoconfig.annotation.ConfigEntry;
 
 @Config(name = "lock_minecart_view")
-public class LockViewConfig implements ConfigData{
+public class LockViewConfig implements ConfigData {
 
     @ConfigEntry.Gui.Tooltip
     public boolean smoothMode = true;
