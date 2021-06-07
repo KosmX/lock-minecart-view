@@ -18,7 +18,9 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.vehicle.MinecartEntity;
 
 @Mixin(ClientPlayerEntity.class)
-public class ClientPlayerMixin extends AbstractClientPlayerEntity{
+public abstract class ClientPlayerMixin extends AbstractClientPlayerEntity{
+
+    @Shadow public abstract float getYaw(float tickDelta);
 
     public ClientPlayerMixin(ClientWorld world, GameProfile profile) {
         super(world, profile);
@@ -33,7 +35,7 @@ public class ClientPlayerMixin extends AbstractClientPlayerEntity{
              *I need to create my own identifier method (from the speed)
              */
             LockViewClient.update((MinecartEntity)vehicle);
-            this.headYaw = LockViewClient.calcYaw(this.headYaw);
+            this.setYaw(LockViewClient.calcYaw(this.getYaw()));
             this.bodyYaw = LockViewClient.calcYaw(this.bodyYaw);
             //this.lastRenderYaw += LockViewClient.correction;
             //this.renderYaw += LockViewClient.correction;
